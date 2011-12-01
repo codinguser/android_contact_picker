@@ -1,3 +1,25 @@
+/*
+* Copyright (C) 2011 by Ngewi Fet <ngewif@gmail.com>
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+* THE SOFTWARE.
+ */
+
 package com.codinguser.android.contactpicker;
 
 import android.os.Bundle;
@@ -32,13 +54,12 @@ public class ContactsPickerActivity extends FragmentActivity implements OnContac
 		detailsFragment.setArguments(args);
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
+		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		// Replace whatever is in the fragment_container view with this fragment,
 		// and add the transaction to the back stack
 		transaction.replace(R.id.fragment_container, detailsFragment);
 		
 		transaction.addToBackStack(null);
-		
-		transaction.setCustomAnimations(R.anim.slide_in_right, android.R.anim.slide_out_right);
 		// Commit the transaction
 		transaction.commit();
 	}
