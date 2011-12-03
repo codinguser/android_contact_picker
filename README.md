@@ -1,11 +1,11 @@
 # Why?
 
 Often in Android development, there is need to support the following workflow:
-* Display list of contacts
-* User selects a contact
-* Display contact details
-* User selects a phone number
-* Perform an action with the number
+- Display list of contacts
+- User selects a contact
+- Display contact details
+- User selects a phone number
+- Perform an action with the number
 
 There is a standard way to call the contact list in Android, but this does not 
 always feel well-integrated in your app and does not work well expecially for tabbed
@@ -23,7 +23,7 @@ in order to include it in your project.
 
 Now, to use the library, your activity could just subclass the `ContactsPickerActivity` and then you can
 override the `OnNumberSelectedMethod` in order to get notified when a number is selected.
-Or if you wish, you can hack directly the source code of th `ContactsPickerActivity*` to get the job done.
+Or if you wish, you can hack directly the source code of the `ContactsPickerActivity` to get the job done.
 
 # License
 The code is provided under an MIT license, so get hacking!!
