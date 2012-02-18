@@ -25,12 +25,55 @@ In order to use the library, just clone the project and follow the instructions 
 [referencing a library project](http://developer.android.com/guide/developing/projects/projects-eclipse.html#ReferencingLibraryProject)
 in order to include it in your project.
 
-Now, to use the library, your activity could just subclass the `ContactsPickerActivity` and then you can
-override the `OnNumberSelectedMethod` in order to get notified when a number is selected.
-Or if you wish, you can hack directly the source code of the `ContactsPickerActivity` to get the job done.
+# Usage
+
+There are two ways to use the library. 
+
+1. If you just want to open a contacts picker from within your app and then get a number, 
+   do this:
+
+	```java
+	private static final int GET_PHONE_NUMBER = 3007;
+	
+	public void getContact() {
+		startActivityForResult(new Intent(this, ContactsPickerActivity.class), GET_PHONE_NUMBER);
+	}
+		
+	// Listen for results.
+	@Override  
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+	    // See which child activity is calling us back.
+	    switch (requestCode) {
+	        case GET_PHONE_NUMBER:
+	            // This is the standard resultCode that is sent back if the
+	            // activity crashed or didn't doesn't supply an explicit result.
+	        	if (resultCode == RESULT_CANCELED){
+	            	Toast.makeText(this, "No phone number found", Toast.LENGTH_SHORT).show();
+	            } 
+	            else {
+	            	String phoneNumber = (String) data.getExtras().get(ContactsPickerActivity.KEY_PHONE_NUMBER);  
+	                //Do what you wish to do with phoneNumber e.g.
+	                //Toast.makeText(this, "Phone number found: " + phoneNumber , Toast.LENGTH_SHORT).show();
+	            }
+	        default:
+	            break;
+	    }
+	}
+	
+	```
+
+2. If you have a tabbed application with multiple activities in Android and you 
+   wish to make a contacts list as one of the tabs, then your contacts activity should 
+   subclass the `ContactsPickerActivity` and override the `OnContactNumberSelected` method 
+   in order to get notified when a number is selected. The default implementation of
+   `OnContactNumberSelected` just sets the number as a result and finishes the activity, 
+   so make sure to override it to do what you want. 
 
 # License
 The code is provided under an MIT license, so get hacking!!
+
+# Acknowledgements
+Thanks to Avi Hayun for feedback used to improve the library
 
 # Contact
 For any inquiries, you can reach me at ngewif@codinguser.com
@@ -38,5 +81,4 @@ For any inquiries, you can reach me at ngewif@codinguser.com
 # Known Issues
 This contact picker only really works in portrait mode. 
 In landscape, the view is not updated properly. This will hopefully be updated in the future.
-
 

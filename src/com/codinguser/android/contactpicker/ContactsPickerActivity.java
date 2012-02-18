@@ -22,15 +22,16 @@
 
 package com.codinguser.android.contactpicker;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.widget.Toast;
 
 public class ContactsPickerActivity extends FragmentActivity implements OnContactSelectedListener{
     public static final String SELECTED_CONTACT_ID = "contact_id";
+	public static final String KEY_PHONE_NUMBER = "phone_number";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +67,10 @@ public class ContactsPickerActivity extends FragmentActivity implements OnContac
 
 	@Override
 	public void onContactNumberSelected(String contactNumber) {
-		// TODO Do what you will with the selected phone number
-		Toast.makeText(this, contactNumber + " selected", Toast.LENGTH_SHORT).show();
+		Intent intent = new Intent();
+		intent.putExtra(KEY_PHONE_NUMBER, contactNumber); 
+		
+        setResult(RESULT_OK, intent);
+        finish();
 	}
 }
