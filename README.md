@@ -16,7 +16,7 @@ ContactPicker is an Android library which allows you to easily integrate the abo
 workflow in your application with minimal effort. It uses the new Fragments API
 introduced in the newer versions of Android.
 
-*This library is aimed at API level 7 and uses the new contact APIs introduced in Android 2.0*
+*This library requires a minimum of Android API level 7 and above since it uses the new contact APIs introduced in Android 2.0*
 
 
 # Installation
