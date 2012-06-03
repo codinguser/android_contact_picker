@@ -62,8 +62,6 @@ public class ContactsListFragment extends ListFragment implements OnQueryTextLis
 			Contacts.LOOKUP_KEY
 	};
 	
-	private static final int COLUMN_LOOKUP_KEY = 3;
-	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
