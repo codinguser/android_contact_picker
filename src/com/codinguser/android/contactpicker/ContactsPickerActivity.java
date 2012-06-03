@@ -30,8 +30,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 public class ContactsPickerActivity extends FragmentActivity implements OnContactSelectedListener{
-    public static final String SELECTED_CONTACT_ID = "contact_id";
-	public static final String KEY_PHONE_NUMBER = "phone_number";
+    public static final String SELECTED_CONTACT_ID 	= "contact_id";
+	public static final String KEY_PHONE_NUMBER 	= "phone_number";	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,4 +73,5 @@ public class ContactsPickerActivity extends FragmentActivity implements OnContac
         setResult(RESULT_OK, intent);
         finish();
 	}
+		
 }

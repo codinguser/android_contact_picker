@@ -41,6 +41,7 @@ import android.widget.TextView;
 public class ContactDetailsFragment extends ListFragment {
 	private TextView mDisplayName;
 	private OnContactSelectedListener mContactsListener;
+	private Cursor mCursor;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,19 +64,17 @@ public class ContactDetailsFragment extends ListFragment {
 		String selection = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?";
 		String[] selectionArgs = new String[] { Long.toString(personId) };
 		
-		Cursor cursor = activity.getContentResolver().query(phonesUri,
+		mCursor = activity.getContentResolver().query(phonesUri,
 				projection, selection, selectionArgs, null);
 
-		activity.startManagingCursor(cursor);
-		
 		mDisplayName = (TextView) activity.findViewById(R.id.display_name);
-		if (cursor.moveToFirst()){
-			mDisplayName.setText(cursor.getString(cursor
+		if (mCursor.moveToFirst()){
+			mDisplayName.setText(mCursor.getString(mCursor
 					.getColumnIndex(Phone.DISPLAY_NAME)));
 		}
 		
 		ListAdapter adapter = new PhoneNumbersAdapter(this.getActivity(),
-				R.layout.list_item_phone_number, cursor, new String[] {
+				R.layout.list_item_phone_number, mCursor, new String[] {
 						Phone.TYPE, Phone.NUMBER }, new int[] { R.id.label,
 						R.id.phone_number });
 		setListAdapter(adapter);
@@ -93,6 +92,12 @@ public class ContactDetailsFragment extends ListFragment {
 	}
 	
 	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		mCursor.close();
+	}
+	
+	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		
@@ -106,7 +111,7 @@ public class ContactDetailsFragment extends ListFragment {
 
 		public PhoneNumbersAdapter(Context context, int layout, Cursor c,
 				String[] from, int[] to) {
-			super(context, layout, c, from, to);
+			super(context, layout, c, from, to, 0);
 		}
 		
 		@Override
