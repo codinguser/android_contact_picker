@@ -91,8 +91,9 @@ public class ContactDetailsFragment extends ListFragment {
 		
 		TextView 	tv 		= (TextView) v.findViewById(R.id.phone_number);
 		String 		number 	= tv.getText().toString();
+		String 		name	= mDisplayName.getText().toString();
 		
-		mContactsListener.onContactNumberSelected(number);
+		mContactsListener.onContactNumberSelected(number, name);
 	}
 	
 	

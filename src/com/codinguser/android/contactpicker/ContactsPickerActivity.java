@@ -23,6 +23,8 @@
 package com.codinguser.android.contactpicker;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -32,6 +34,7 @@ import android.support.v4.app.FragmentTransaction;
 public class ContactsPickerActivity extends FragmentActivity implements OnContactSelectedListener {
     public static final String SELECTED_CONTACT_ID 	= "contact_id";
 	public static final String KEY_PHONE_NUMBER 	= "phone_number";
+	public static final String KEY_CONTACT_NAME 	= "contact_name";
 
 	/** Starting point which actually just calls the ContactListFragment */
 	@Override
@@ -70,9 +73,10 @@ public class ContactsPickerActivity extends FragmentActivity implements OnContac
 
 	/** Callback when the contact number is selected from the contact details view */
 	@Override
-	public void onContactNumberSelected(String contactNumber) {
+	public void onContactNumberSelected(String contactNumber, String contactName) {
 		Intent intent = new Intent();
 		intent.putExtra(KEY_PHONE_NUMBER, contactNumber);
+		intent.putExtra(KEY_CONTACT_NAME, contactName);
 		
         setResult(RESULT_OK, intent);
         finish();

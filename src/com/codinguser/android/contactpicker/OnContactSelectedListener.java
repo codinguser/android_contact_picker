@@ -34,5 +34,5 @@ public interface OnContactSelectedListener {
 	 * Callback when the contact number is selected from the contact details view
 	 * @param contactNumber String representation of the number which was selected
 	 */
-	public void onContactNumberSelected(String contactNumber);
+	public void onContactNumberSelected(String contactNumber, String contactName);
 }
