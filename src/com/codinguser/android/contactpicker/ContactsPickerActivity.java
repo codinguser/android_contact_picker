@@ -29,28 +29,31 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
-public class ContactsPickerActivity extends FragmentActivity implements OnContactSelectedListener{
-    public static final String SELECTED_CONTACT_ID = "contact_id";
-	public static final String KEY_PHONE_NUMBER = "phone_number";
+public class ContactsPickerActivity extends FragmentActivity implements OnContactSelectedListener {
+    public static final String SELECTED_CONTACT_ID 	= "contact_id";
+	public static final String KEY_PHONE_NUMBER 	= "phone_number";
 
+	/** Starting point which actually just calls the ContactListFragment */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_contacts);
 		
-		FragmentManager fragmentManager = this.getSupportFragmentManager();
-		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-		ContactsListFragment fragment = new ContactsListFragment();
+		FragmentManager 		fragmentManager 	= this.getSupportFragmentManager();
+		FragmentTransaction 	fragmentTransaction = fragmentManager.beginTransaction();
+		ContactsListFragment 	fragment 			= new ContactsListFragment();
+		
 		fragmentTransaction.add(R.id.fragment_container, fragment);
 		fragmentTransaction.commit();
 	}
 
+	/** Callback when the contact is selected from the list of contacts, actually calls ContactDetailsFragment */
 	@Override
 	public void onContactNameSelected(long contactId) {
-		// move to the details fragment
+		/* Now that we know which Contact was selected we can go to the details fragment */
 		
-		Fragment detailsFragment = new ContactDetailsFragment();
-		Bundle args = new Bundle();
+		Fragment 	detailsFragment = new ContactDetailsFragment();
+		Bundle 		args 			= new Bundle();
 		args.putLong(ContactsPickerActivity.SELECTED_CONTACT_ID, contactId);
 		detailsFragment.setArguments(args);
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -65,10 +68,11 @@ public class ContactsPickerActivity extends FragmentActivity implements OnContac
 		transaction.commit();
 	}
 
+	/** Callback when the contact number is selected from the contact details view */
 	@Override
 	public void onContactNumberSelected(String contactNumber) {
 		Intent intent = new Intent();
-		intent.putExtra(KEY_PHONE_NUMBER, contactNumber); 
+		intent.putExtra(KEY_PHONE_NUMBER, contactNumber);
 		
         setResult(RESULT_OK, intent);
         finish();

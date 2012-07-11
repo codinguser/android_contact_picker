@@ -42,12 +42,11 @@ import android.widget.SimpleCursorAdapter;
 
 public class ContactsListFragment extends ListFragment {
 
-	private Cursor mCursor;
-	private OnContactSelectedListener mContactsListener;
+	private Cursor 						mCursor;
+	private OnContactSelectedListener 	mContactsListener;
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_contacts_list, container, false);
 	}
 	
@@ -57,16 +56,16 @@ public class ContactsListFragment extends ListFragment {
 
 		ContentResolver resolver = getActivity().getContentResolver();
 		
+		/* The Ingredients for the contacts browsing: URI, Projection, selection, sortOrder */
 		Uri uri = ContactsContract.Contacts.CONTENT_URI;
-		
 		String[] projection = new String[] {
 				Contacts._ID, 
 				Contacts.DISPLAY_NAME, 
 				Contacts.HAS_PHONE_NUMBER
 		};
-		
 		String selection = Contacts.HAS_PHONE_NUMBER + "= '1'";
 		String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
+		
 		mCursor = resolver.query(uri, 
 				projection, 
 				selection,
@@ -102,12 +101,11 @@ public class ContactsListFragment extends ListFragment {
 		}
 	}
 
-	class IndexedListAdapter extends SimpleCursorAdapter implements SectionIndexer{
+	class IndexedListAdapter extends SimpleCursorAdapter implements SectionIndexer {
 
 		AlphabetIndexer alphaIndexer;
 		
-		public IndexedListAdapter(Context context, int layout, Cursor c,
-				String[] from, int[] to) {
+		public IndexedListAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
 			super(context, layout, c, from, to);
 			alphaIndexer = new AlphabetIndexer(c, c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 		}
@@ -126,9 +124,5 @@ public class ContactsListFragment extends ListFragment {
 		public Object[] getSections() {
 			return alphaIndexer.getSections();
 		}
-		
-		
-		
-		
 	}
 }
