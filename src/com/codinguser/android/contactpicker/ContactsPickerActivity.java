@@ -23,8 +23,6 @@
 package com.codinguser.android.contactpicker;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -36,7 +34,10 @@ public class ContactsPickerActivity extends FragmentActivity implements OnContac
 	public static final String KEY_PHONE_NUMBER 	= "phone_number";
 	public static final String KEY_CONTACT_NAME 	= "contact_name";
 
-	/** Starting point which actually just calls the ContactListFragment */
+	/**
+	 * Starting point
+	 * Loads the {@link ContactsListFragment} 
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,7 +51,10 @@ public class ContactsPickerActivity extends FragmentActivity implements OnContac
 		fragmentTransaction.commit();
 	}
 
-	/** Callback when the contact is selected from the list of contacts, actually calls ContactDetailsFragment */
+	/** 
+	 * Callback when the contact is selected from the list of contacts.
+	 * Loads the {@link ContactDetailsFragment} 
+	 */
 	@Override
 	public void onContactNameSelected(long contactId) {
 		/* Now that we know which Contact was selected we can go to the details fragment */
@@ -71,7 +75,10 @@ public class ContactsPickerActivity extends FragmentActivity implements OnContac
 		transaction.commit();
 	}
 
-	/** Callback when the contact number is selected from the contact details view */
+	/** 
+	 * Callback when the contact number is selected from the contact details view 
+	 * Sets the activity result with the contact information and finishes
+	 */
 	@Override
 	public void onContactNumberSelected(String contactNumber, String contactName) {
 		Intent intent = new Intent();
