@@ -30,6 +30,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
+import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -87,14 +89,35 @@ public class ContactsListFragment extends ListFragment {
 	
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		mContactsListener.onContactNameSelected(id);
+		/* Retrieving the phone numbers in order to see if we have more than one */
+		String phoneNumber = null;
+		
+		String[] projection = new String[] {Phone.NUMBER};
+    	final Cursor phoneCursor = getActivity().getContentResolver().query(
+			Phone.CONTENT_URI,
+			projection,
+			Data.CONTACT_ID + "=?",
+			new String[]{String.valueOf(id)},
+			null);
+    	
+    	if(phoneCursor.moveToFirst() && phoneCursor.isLast()) {
+    		final int contactNumberColumnIndex 	= phoneCursor.getColumnIndex(Phone.NUMBER);
+    			
+   			phoneNumber = phoneCursor.getString(contactNumberColumnIndex);
+    	}
+    	phoneCursor.close();
+		
+    	if (phoneNumber != null)
+    		mContactsListener.onContactNumberSelected(phoneNumber, mCursor.getString(mCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
+    	else
+    		mContactsListener.onContactNameSelected(id);
 	}
 	
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		
-		try {
+		try {			
 			mContactsListener = (OnContactSelectedListener) activity;
 		} catch (ClassCastException	e) {
 			throw new ClassCastException(activity.toString() + " must implement OnContactSelectedListener");
