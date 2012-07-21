@@ -88,4 +88,5 @@ public class ContactsPickerActivity extends FragmentActivity implements OnContac
         setResult(RESULT_OK, intent);
         finish();
 	}
+		
 }

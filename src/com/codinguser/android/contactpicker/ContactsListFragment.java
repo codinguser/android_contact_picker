@@ -23,7 +23,6 @@
 package com.codinguser.android.contactpicker;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -31,19 +30,37 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AlphabetIndexer;
-import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 import android.widget.SectionIndexer;
 import android.widget.SimpleCursorAdapter;
 
-public class ContactsListFragment extends ListFragment {
+public class ContactsListFragment extends ListFragment implements OnQueryTextListener, 
+	LoaderCallbacks<Cursor>{
 
-	private Cursor 						mCursor;
-	private OnContactSelectedListener 	mContactsListener;
+	private Cursor mCursor;
+	private OnContactSelectedListener mContactsListener;
+	private SimpleCursorAdapter mAdapter;
+	private String mCurrentFilter = null;
+	
+	private static final String[] CONTACTS_SUMMARY_PROJECTION = new String[] {
+			Contacts._ID, 
+			Contacts.DISPLAY_NAME, 
+			Contacts.HAS_PHONE_NUMBER,
+			Contacts.LOOKUP_KEY
+	};
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,35 +71,20 @@ public class ContactsListFragment extends ListFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		ContentResolver resolver = getActivity().getContentResolver();
+		setHasOptionsMenu(true);
 		
-		/* The Ingredients for the contacts browsing: URI, Projection, selection, sortOrder */
-		Uri uri = ContactsContract.Contacts.CONTENT_URI;
-		String[] projection = new String[] {
-				Contacts._ID, 
-				Contacts.DISPLAY_NAME, 
-				Contacts.HAS_PHONE_NUMBER
-		};
-		String selection = Contacts.HAS_PHONE_NUMBER + "= '1'";
-		String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
+		getLoaderManager().initLoader(0, null, this);
 		
-		mCursor = resolver.query(uri, 
-				projection, 
-				selection,
-				null, 
-				sortOrder);
-		
-		getActivity().startManagingCursor(mCursor);
-		
-		ListAdapter adapter = new IndexedListAdapter(
+		mAdapter = new IndexedListAdapter(
 				this.getActivity(),
 				R.layout.list_item_contacts,
 				mCursor,
 				new String[] {ContactsContract.Contacts.DISPLAY_NAME},
 				new int[] {R.id.display_name});
 		
-		setListAdapter(adapter);
+		setListAdapter(mAdapter);
 		getListView().setFastScrollEnabled(true);
+		
 	}
 	
 	@Override
@@ -100,16 +102,81 @@ public class ContactsListFragment extends ListFragment {
 			throw new ClassCastException(activity.toString() + " must implement OnContactSelectedListener");
 		}
 	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        MenuItem item = menu.add(R.string.label_search);
+        item.setIcon(android.R.drawable.ic_menu_search);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        SearchView sv = new SearchView(getActivity());
+        sv.setOnQueryTextListener(this);
+        item.setActionView(sv);
+    }
+	
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		Uri baseUri;
+		
+		if (mCurrentFilter != null) {
+            baseUri = Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI,
+                    Uri.encode(mCurrentFilter));
+        } else {
+            baseUri = Contacts.CONTENT_URI;
+        }
+		
+		String selection = "((" + Contacts.DISPLAY_NAME + " NOTNULL) AND ("
+	            + Contacts.HAS_PHONE_NUMBER + "=1) AND ("
+	            + Contacts.DISPLAY_NAME + " != '' ))";
+		
+		String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
+		
+		return new CursorLoader(getActivity(), baseUri, CONTACTS_SUMMARY_PROJECTION, selection, null, sortOrder);
+	}
+	
 
-	class IndexedListAdapter extends SimpleCursorAdapter implements SectionIndexer {
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		mAdapter.swapCursor(data);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		mAdapter.swapCursor(null);
+	}
+
+	@Override
+	public boolean onQueryTextChange(String newText) {
+        mCurrentFilter = !TextUtils.isEmpty(newText) ? newText : null;
+        getLoaderManager().restartLoader(0, null, this);
+        return true;
+    }
+	
+	@Override
+	public boolean onQueryTextSubmit(String query) {
+		// nothing to see here, move along
+		return true;
+	}
+	
+	class IndexedListAdapter extends SimpleCursorAdapter implements SectionIndexer{
 
 		AlphabetIndexer alphaIndexer;
 		
-		public IndexedListAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
-			super(context, layout, c, from, to);
-			alphaIndexer = new AlphabetIndexer(c, c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+		public IndexedListAdapter(Context context, int layout, Cursor c,
+				String[] from, int[] to) {
+			super(context, layout, c, from, to, 0);		
 		}
 
+		@Override
+		public Cursor swapCursor(Cursor c) {
+			if (c != null) {
+				alphaIndexer = new AlphabetIndexer(c,
+						c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME),
+						" ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+			}
+
+			return super.swapCursor(c);
+		}
+		
 		@Override
 		public int getPositionForSection(int section) {
 			return alphaIndexer.getPositionForSection(section);
@@ -122,7 +189,11 @@ public class ContactsListFragment extends ListFragment {
 
 		@Override
 		public Object[] getSections() {
-			return alphaIndexer.getSections();
+			return alphaIndexer == null ? null : alphaIndexer.getSections();
 		}
+	
 	}
+
+
+
 }

@@ -3,5 +3,6 @@
 
     <string name="hello">Hello World, ContactsPickerActivity!</string>
     <string name="app_name">ContactsPicker</string>
+    <string name="label_search">Search</string>
 
 </resources>
