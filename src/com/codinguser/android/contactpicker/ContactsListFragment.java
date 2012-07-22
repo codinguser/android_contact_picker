@@ -87,8 +87,9 @@ public class ContactsListFragment extends ListFragment implements
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		/* Retrieving the phone numbers in order to see if we have more than one */
 		String phoneNumber = null;
+		String name = null;
 		
-		String[] projection = new String[] {Phone.NUMBER};
+		String[] projection = new String[] {Phone.DISPLAY_NAME, Phone.NUMBER};
     	final Cursor phoneCursor = getActivity().getContentResolver().query(
 			Phone.CONTENT_URI,
 			projection,
@@ -97,16 +98,17 @@ public class ContactsListFragment extends ListFragment implements
 			null);
     	
     	if(phoneCursor.moveToFirst() && phoneCursor.isLast()) {
-    		final int contactNumberColumnIndex 	= phoneCursor.getColumnIndex(Phone.NUMBER);
-    			
+    		final int contactNumberColumnIndex 	= phoneCursor.getColumnIndex(Phone.NUMBER);    			
    			phoneNumber = phoneCursor.getString(contactNumberColumnIndex);
+   			name = phoneCursor.getString(phoneCursor.getColumnIndex(Phone.DISPLAY_NAME));
     	}
-    	phoneCursor.close();
 		
-    	if (phoneNumber != null)
-    		mContactsListener.onContactNumberSelected(phoneNumber, mCursor.getString(mCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
-    	else
+    	if (phoneNumber != null){    		  		
+    		mContactsListener.onContactNumberSelected(phoneNumber, name);
+    	}
+    	else {
     		mContactsListener.onContactNameSelected(id);
+    	}
 	}
 	
 	@Override

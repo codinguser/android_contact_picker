@@ -67,14 +67,13 @@ public class ContactDetailsFragment extends ListFragment {
 
 		mDisplayName = (TextView) activity.findViewById(R.id.display_name);
 		if (mCursor.moveToFirst()){
-			mDisplayName.setText(mCursor.getString(mCursor
-					.getColumnIndex(Phone.DISPLAY_NAME)));
+			mDisplayName.setText(mCursor.getString(mCursor.getColumnIndex(Phone.DISPLAY_NAME)));
 		}
 		
 		ListAdapter adapter = new PhoneNumbersAdapter(this.getActivity(),
-				R.layout.list_item_phone_number, mCursor, new String[] {
-						Phone.TYPE, Phone.NUMBER }, new int[] { R.id.label,
-						R.id.phone_number });
+				R.layout.list_item_phone_number, mCursor, 
+				new String[] {Phone.TYPE, Phone.NUMBER }, 
+				new int[] { R.id.label, R.id.phone_number });
 		setListAdapter(adapter);
 	}
 	
