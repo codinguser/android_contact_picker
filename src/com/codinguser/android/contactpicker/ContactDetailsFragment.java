@@ -30,12 +30,12 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v4.app.ListFragment;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class ContactDetailsFragment extends ListFragment {
@@ -105,8 +105,7 @@ public class ContactDetailsFragment extends ListFragment {
 		
 		mContactsListener.onContactNumberSelected(number, name);
 	}
-	
-	
+		
 	class PhoneNumbersAdapter extends SimpleCursorAdapter {
 
 		public PhoneNumbersAdapter(Context context, int layout, Cursor c,

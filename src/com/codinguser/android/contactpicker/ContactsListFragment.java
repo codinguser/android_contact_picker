@@ -33,21 +33,15 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.text.TextUtils;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AlphabetIndexer;
 import android.widget.ListView;
-import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
 import android.widget.SectionIndexer;
-import android.widget.SimpleCursorAdapter;
 
-public class ContactsListFragment extends ListFragment implements OnQueryTextListener, 
+public class ContactsListFragment extends ListFragment implements 
 	LoaderCallbacks<Cursor>{
 
 	private Cursor mCursor;
@@ -104,16 +98,6 @@ public class ContactsListFragment extends ListFragment implements OnQueryTextLis
 	}
 	
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuItem item = menu.add(R.string.label_search);
-        item.setIcon(android.R.drawable.ic_menu_search);
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        SearchView sv = new SearchView(getActivity());
-        sv.setOnQueryTextListener(this);
-        item.setActionView(sv);
-    }
-	
-	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 		Uri baseUri;
 		
@@ -133,7 +117,6 @@ public class ContactsListFragment extends ListFragment implements OnQueryTextLis
 		return new CursorLoader(getActivity(), baseUri, CONTACTS_SUMMARY_PROJECTION, selection, null, sortOrder);
 	}
 	
-
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		mAdapter.swapCursor(data);
@@ -144,19 +127,6 @@ public class ContactsListFragment extends ListFragment implements OnQueryTextLis
 		mAdapter.swapCursor(null);
 	}
 
-	@Override
-	public boolean onQueryTextChange(String newText) {
-        mCurrentFilter = !TextUtils.isEmpty(newText) ? newText : null;
-        getLoaderManager().restartLoader(0, null, this);
-        return true;
-    }
-	
-	@Override
-	public boolean onQueryTextSubmit(String query) {
-		// nothing to see here, move along
-		return true;
-	}
-	
 	class IndexedListAdapter extends SimpleCursorAdapter implements SectionIndexer{
 
 		AlphabetIndexer alphaIndexer;
