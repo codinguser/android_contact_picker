@@ -58,7 +58,7 @@ public class ContactDetailsFragment extends ListFragment {
 		Uri phonesUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
 		String[] projection = new String[] {
 				Phone._ID, Phone.DISPLAY_NAME,
-				Phone.TYPE, Phone.NUMBER };
+				Phone.TYPE, Phone.NUMBER, Phone.LABEL };
 		String 		selection 		= ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?";
 		String[] 	selectionArgs 	= new String[] { Long.toString(personId) };
 		
@@ -118,7 +118,9 @@ public class ContactDetailsFragment extends ListFragment {
 			
 			TextView 	tx 		= (TextView) view.findViewById(R.id.label);
 			int 		type 	= cursor.getInt(cursor.getColumnIndex(Phone.TYPE));
-			String 		label 	= Phone.getTypeLabel(getResources(), type, "Custom").toString();
+			String 		label = cursor.getString(cursor.getColumnIndex(Phone.LABEL)); 
+			label = Phone.getTypeLabel(getResources(), type, label).toString();
+				
 			tx.setText(label);
 		}
 	}
