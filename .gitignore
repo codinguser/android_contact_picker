@@ -3,3 +3,8 @@
 bin/
 target
 gen/
+
+#IntelliJ IDEA
+.idea/
+*.iml
+gen-external-apklibs
