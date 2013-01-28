@@ -14,7 +14,7 @@ Android applications.
 
 ContactPicker is an Android library which allows you to easily integrate the above
 workflow in your application with minimal effort. It uses the new Fragments API
-introduced in the newer versions of Android.
+and asynchronous contact loading introduced in the newer versions of Android.
 
 *This library requires a minimum of Android API level 7 and above since it uses the new contact APIs introduced in Android 2.0*
 
@@ -25,6 +25,15 @@ In order to use the library, just clone the project and follow the instructions 
 [referencing a library project](http://developer.android.com/guide/developing/projects/projects-eclipse.html#ReferencingLibraryProject)
 in order to include it in your project.
 
+If you are using maven, then it is even easier. Add the following to your dependencies:
+<pre> <code>
+&lt;dependency&gt;
+  &lt;groupId&gt;com.codinguser.android&lt;/groupId&gt;
+  &lt;artifactId&gt;contactpicker&lt;/artifactId&gt;
+  &lt;version&gt;2.2.0&lt;/version&gt;
+  &lt;type&gt;apklib&lt;/type&gt;
+&lt;/dependency&gt;
+</code> </pre>
 # Usage
 
 There are two ways to use the library. 
@@ -77,8 +86,4 @@ Thanks to Avi Hayun for feedback used to improve the library
 
 # Contact
 For any inquiries, you can reach me at ngewif@codinguser.com
-
-# Known Issues
-This contact picker only really works in portrait mode. 
-In landscape, the view is not updated properly. This will hopefully be updated in the future.
 

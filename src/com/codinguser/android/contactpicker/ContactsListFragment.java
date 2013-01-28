@@ -46,7 +46,6 @@ import android.widget.SectionIndexer;
 public class ContactsListFragment extends ListFragment implements 
 	LoaderCallbacks<Cursor>{
 
-	private Cursor mCursor;
 	private OnContactSelectedListener mContactsListener;
 	private SimpleCursorAdapter mAdapter;
 	private String mCurrentFilter = null;
@@ -74,7 +73,7 @@ public class ContactsListFragment extends ListFragment implements
 		mAdapter = new IndexedListAdapter(
 				this.getActivity(),
 				R.layout.list_item_contacts,
-				mCursor,
+				null,
 				new String[] {ContactsContract.Contacts.DISPLAY_NAME},
 				new int[] {R.id.display_name});
 		
