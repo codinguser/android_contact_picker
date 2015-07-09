@@ -74,8 +74,6 @@ public class ContactsListFragment extends ListFragment implements
 			Contacts.LOOKUP_KEY
 	};
 
-	private static final String SELECTION = DISPLAY_NAME_COMPAT + " LIKE ?";
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_contacts_list, container, false);

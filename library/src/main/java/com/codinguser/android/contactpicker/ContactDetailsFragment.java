@@ -89,12 +89,6 @@ public class ContactDetailsFragment extends ListFragment {
 	}
 	
 	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		mCursor.close();
-	}
-	
-	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		
