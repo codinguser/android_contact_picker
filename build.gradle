@@ -1,5 +1,19 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+def versionMajor = 3
+def versionMinor = 0
+def versionPatch = 0
+def versionBuild = 0
+
+ext{
+	minSdkVersion = 8
+	targetSdkVersion = 22
+    compileSdkVersion = 22
+    buildToolsVersion = "22.0.1"
+    versionCode = versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+    versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
+}
+
 buildscript {
     repositories {
         jcenter()

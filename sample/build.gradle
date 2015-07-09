@@ -1,20 +1,15 @@
 apply plugin: 'com.android.application'
 
-def versionMajor = 3
-def versionMinor = 0
-def versionPatch = 0
-def versionBuild = 0
-
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
 
     defaultConfig {
 		applicationId "com.codinguser.android.contactpicker.sample"
-        minSdkVersion 8
-        targetSdkVersion 22
-        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
-        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode rootProject.versionCode
+        versionName rootProject.versionName
     }
 
     buildTypes {
@@ -26,6 +21,13 @@ android {
 
     lintOptions {
         abortOnError false
+    }
+	
+	applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFile = new File(
+                    output.outputFile.parent, "contact_picker_sample_v${variant.versionName}.apk")
+        }
     }
 
     compileOptions { //we want switch with strings during xml parsing
