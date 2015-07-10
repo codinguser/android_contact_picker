@@ -13,6 +13,7 @@ gen-external-apklibs
 build
 .gradle
 local.properties
+gradle.properties
 gradle/local.properties
 .settings
 .metadata

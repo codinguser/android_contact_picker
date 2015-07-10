@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -35,9 +37,96 @@ android {
     }
 }
 
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-v4:22.2.0'
     compile 'com.android.support:appcompat-v7:22.2.0'
 }
+
+group = "com.codinguser.android"
+version = rootProject.versionName
+
+//
+//task javadocJar(type: Jar, dependsOn: javadoc){
+//    classifier = 'javadoc'
+//    from javadoc.destinationDir
+//}
+//
+//task sourcesJar(type: Jar){
+//    classifier = 'sources'
+//    from sourceSets.main.allSource
+//}
+//
+//artifacts{
+//    archives javadocJar, sourcesJar
+//}
+
+configurations {
+    archives {
+        extendsFrom configurations.default
+    }
+}
+
+signing{
+    required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+uploadArchives{
+    repositories{
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment ->
+                signing.signPom(deployment)
+            }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Android Contact Picker Library'
+                packaging 'aar'
+                artifactId 'contactpicker'// optionally artifactId can be defined here
+                description 'Android library for picking a contact and retrieving a phone number'
+                url 'https://github.com/codinguser/android_contact_picker'
+
+                scm {
+                    connection 'scm:git:git://github.com/codinguser/android_contact_picker.git'
+                    developerConnection 'scm:git:git@github.com:codinguser/android_contact_picker.git'
+                    url 'https://github.com/codinguser/android_contact_picker'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'http://opensource.org/licenses/MIT'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'codinguser'
+                        name 'Ngewi Fet'
+                        email 'ngewif@gmail.com'
+                        url 'http://www.codinguser.com'
+                    }
+                    developer {
+                        id 'chaiavi'
+                        name 'Avi Hayun'
+                        email 'avraham2@gmail.com'
+                        url 'http://chaiware.org'
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+

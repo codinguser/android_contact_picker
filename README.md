@@ -16,23 +16,14 @@ ContactPicker is an Android library which allows you to easily integrate the abo
 workflow in your application with minimal effort. It uses the new Fragments API
 and asynchronous contact loading introduced in the newer versions of Android.
 
-*This library requires a minimum of Android API level 7 and above since it uses the new contact APIs introduced in Android 2.0*
+*This library requires a minimum of Android API level 8 and above since it uses the new contact APIs introduced in Android 2.0*
 
 
 # Installation
 
-In order to use the library, just clone the project and follow the instructions for
-[referencing a library project](http://developer.android.com/guide/developing/projects/projects-eclipse.html#ReferencingLibraryProject)
-in order to include it in your project.
-
-If you are using maven, then it is even easier. Add the following to your dependencies:
+In order to use the library, add the following line to your Gradle dependencies:
 <pre> <code>
-&lt;dependency&gt;
-  &lt;groupId&gt;com.codinguser.android&lt;/groupId&gt;
-  &lt;artifactId&gt;contactpicker&lt;/artifactId&gt;
-  &lt;version&gt;2.2.0&lt;/version&gt;
-  &lt;type&gt;apklib&lt;/type&gt;
-&lt;/dependency&gt;
+compile 'com.codinguser.android:contactpicker:3.0.0'
 </code> </pre>
 # Usage
 
@@ -44,7 +35,7 @@ There are two ways to use the library.
 	```java
 	private static final int GET_PHONE_NUMBER = 3007;
 	
-	public void getContact() {
+	public void getContact() {		
 		startActivityForResult(new Intent(this, ContactsPickerActivity.class), GET_PHONE_NUMBER);
 	}
 		
