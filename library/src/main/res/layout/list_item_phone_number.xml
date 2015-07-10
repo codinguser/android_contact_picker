@@ -24,8 +24,9 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout1"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content" 
     style="@style/ListItem">
 
@@ -33,19 +34,19 @@
         android:id="@+id/label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="phone"
+        tools:text="Mobile"
         android:padding="5dp"
         android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:id="@+id/phone_number"
-        android:layout_width="fill_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
         android:padding="5dp"
-        android:text="+1-PLACE-HOLDER"
+        tools:text="+1-555-PLACEHOLDER"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </LinearLayout>

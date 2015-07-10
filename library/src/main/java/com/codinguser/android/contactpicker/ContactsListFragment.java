@@ -117,6 +117,10 @@ public class ContactsListFragment extends ListFragment implements
 			return true;
 		}
 
+		if (actionId == android.R.id.home){
+			getActivity().finish();
+		}
+
 		return super.onOptionsItemSelected(item);
 	}
 

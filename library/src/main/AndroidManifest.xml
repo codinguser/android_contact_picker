@@ -23,6 +23,8 @@
 */
 -->
 
-<manifest package="com.codinguser.android.contactpicker">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.codinguser.android.contactpicker">
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <!-- Nothing to see here, move along! -->
 </manifest>
