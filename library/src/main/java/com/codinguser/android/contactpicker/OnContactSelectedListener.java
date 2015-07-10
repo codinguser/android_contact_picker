@@ -36,4 +36,11 @@ public interface OnContactSelectedListener {
 	 * @param contactName Name of the contact which was selected as String
 	 */
 	void onContactNumberSelected(String contactNumber, String contactName);
+
+	/**
+	 * Callback when a contact email address is selected from contact details view
+	 * @param emailAddress String containing email address selected
+	 * @param contactName Display name of the contact
+	 */
+	void onContactEmailSelected(String emailAddress, String contactName);
 }

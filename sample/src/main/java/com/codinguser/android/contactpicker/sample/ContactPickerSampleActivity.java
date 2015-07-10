@@ -37,6 +37,7 @@ public class ContactPickerSampleActivity extends ContactsPickerActivity implemen
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		getIntent().putExtra(ARG_PICKER_MODE, REQUST_CONTACT_EMAIL);
 		super.onCreate(savedInstanceState);
 		ActionBar actionBar = getSupportActionBar();
 		if (actionBar != null){
@@ -49,10 +50,16 @@ public class ContactPickerSampleActivity extends ContactsPickerActivity implemen
 	 * Sets the activity result with the contact information and finishes
 	 */
 	@Override
-	public void onContactNumberSelected(String contactNumber, String contactName) {
+	 public void onContactNumberSelected(String contactNumber, String contactName) {
 		Toast.makeText(this, String.format("Selected:\n %s: %s\nAn intent would be delivered to your app",
 						contactName, contactNumber),
 				Toast.LENGTH_LONG).show();
 	}
-		
+
+	@Override
+	public void onContactEmailSelected(String email, String contactName) {
+		Toast.makeText(this, String.format("Selected:\n %s: <%s>\nAn intent would be delivered to your app",
+						contactName, email),
+				Toast.LENGTH_LONG).show();
+	}
 }

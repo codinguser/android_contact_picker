@@ -42,7 +42,8 @@ public class ContactDetailsFragment extends ListFragment {
 	private TextView 					mDisplayName;
 	private OnContactSelectedListener 	mContactsListener;
 	private Cursor mCursor;
-	
+
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_contact_detail, container, false);
@@ -52,7 +53,7 @@ public class ContactDetailsFragment extends ListFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
-		long 		personId = getArguments().getLong(ContactsPickerActivity.SELECTED_CONTACT_ID);// getIntent().getLongExtra("id", 0);
+		long 		personId = getArguments().getLong(ContactsPickerActivity.ARG_CONTACT_ID);// getIntent().getLongExtra("id", 0);
 		Activity 	activity = getActivity();
 		
 		Uri phonesUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;

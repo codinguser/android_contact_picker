@@ -24,6 +24,7 @@ package com.codinguser.android.contactpicker;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -32,6 +33,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
@@ -77,6 +79,20 @@ public class ContactsListFragment extends ListFragment implements
 			Contacts.HAS_PHONE_NUMBER,
 			Contacts.LOOKUP_KEY
 	};
+
+	private ContactsPickerActivity.PickerMode mPickerMode = ContactsPickerActivity.PickerMode.PHONE;
+
+	/**
+	 * Creates a new instance of the contact list fragment.
+	 * <p>The {@code pickerMode} indicates whether phone numbers or emails are to be selected.<br></p>
+	 * @param pickerMode {@link ContactsPickerActivity.PickerMode} in which to start the fragment
+	 * @return New instance of the contact list fragment
+	 */
+	public static ContactsListFragment newInstance(ContactsPickerActivity.PickerMode pickerMode){
+		ContactsListFragment contactsListFragment = new ContactsListFragment();
+		contactsListFragment.mPickerMode = pickerMode;
+		return contactsListFragment;
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -162,12 +178,40 @@ public class ContactsListFragment extends ListFragment implements
         } else {
             baseUri = Contacts.CONTENT_URI;
         }
-
-		String selection = "((" + DISPLAY_NAME_COMPAT + " NOTNULL) AND ("
-				+ Contacts.HAS_PHONE_NUMBER + "=1) AND ("
-				+ DISPLAY_NAME_COMPAT + " != '' ))";
-
 		String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
+
+		String selection;
+		switch (mPickerMode){
+			case EMAIL: {
+				ContentResolver cr = getActivity().getContentResolver();
+				String[] PROJECTION = new String[] { ContactsContract.RawContacts._ID,
+						ContactsContract.Contacts.DISPLAY_NAME,
+						ContactsContract.CommonDataKinds.Email.DATA };
+				sortOrder = "CASE WHEN "
+						+ ContactsContract.Contacts.DISPLAY_NAME
+						+ " NOT LIKE '%@%' THEN 1 ELSE 2 END, "
+						+ ContactsContract.Contacts.DISPLAY_NAME
+						+ ", "
+						+ ContactsContract.CommonDataKinds.Email.DATA
+						+ " COLLATE NOCASE";
+				selection = ContactsContract.CommonDataKinds.Email.DATA + " NOT LIKE ''";
+
+				if (mSearchString != null)
+					baseUri = Uri.withAppendedPath(Email.CONTENT_FILTER_URI, Uri.encode(mSearchString));
+				else
+					baseUri = Email.CONTENT_URI;
+
+				return new CursorLoader(getActivity(), baseUri, PROJECTION, selection, null, sortOrder);
+			} //break;
+
+			case PHONE:
+			default:
+				selection = "((" + DISPLAY_NAME_COMPAT + " NOTNULL) AND ("
+						+ Contacts.HAS_PHONE_NUMBER + "=1) AND ("
+						+ DISPLAY_NAME_COMPAT + " != '' ))";
+				break;
+		}
+
 
 		return new CursorLoader(getActivity(), baseUri, CONTACTS_SUMMARY_PROJECTION, selection, null, sortOrder);
 	}
@@ -301,23 +345,49 @@ public class ContactsListFragment extends ListFragment implements
 
 		@Override
 		protected Void doInBackground(Long... ids) {
-			String[] projection = new String[] {Phone.DISPLAY_NAME, Phone.TYPE, Phone.NUMBER, Phone.LABEL};
-			long contactId = ids[0];
+			switch (mPickerMode){
 
-			final Cursor phoneCursor = getActivity().getContentResolver().query(
-					Phone.CONTENT_URI,
-					projection,
-					Data.CONTACT_ID + "=?",
-					new String[]{String.valueOf(contactId)},
-					null);
+				case PHONE: {
+					String[] projection = new String[] {Phone.DISPLAY_NAME, Phone.TYPE, Phone.NUMBER, Phone.LABEL};
+					long contactId = ids[0];
 
-			if(phoneCursor != null && phoneCursor.moveToFirst() && phoneCursor.getCount() == 1) {
-				final int contactNumberColumnIndex 	= phoneCursor.getColumnIndex(Phone.NUMBER);
-				mPhoneNumber = phoneCursor.getString(contactNumberColumnIndex);
-				int type = phoneCursor.getInt(phoneCursor.getColumnIndexOrThrow(Phone.TYPE));
-				mPhoneLabel = phoneCursor.getString(phoneCursor.getColumnIndex(Phone.LABEL));
-				mPhoneLabel = Phone.getTypeLabel(getResources(), type, mPhoneLabel).toString();
-				phoneCursor.close();
+					final Cursor phoneCursor = getActivity().getContentResolver().query(
+							Phone.CONTENT_URI,
+							projection,
+							Data.CONTACT_ID + "=?",
+							new String[]{String.valueOf(contactId)},
+							Phone.TYPE + " ASC ");
+
+					if (phoneCursor != null && phoneCursor.moveToFirst() && phoneCursor.getCount() == 1) {
+						final int contactNumberColumnIndex 	= phoneCursor.getColumnIndex(Phone.NUMBER);
+						mPhoneNumber = phoneCursor.getString(contactNumberColumnIndex);
+						int type = phoneCursor.getInt(phoneCursor.getColumnIndexOrThrow(Phone.TYPE));
+						mPhoneLabel = phoneCursor.getString(phoneCursor.getColumnIndex(Phone.LABEL));
+						mPhoneLabel = Phone.getTypeLabel(getResources(), type, mPhoneLabel).toString();
+						phoneCursor.close();
+					}
+				} break;
+
+				case EMAIL: {
+					String[] projection = new String[] {Email.TYPE, Email.LABEL, Email.ADDRESS };
+					long contactId = ids[0];
+
+					final Cursor emailCursor = getActivity().getContentResolver().query(
+							Email.CONTENT_URI,
+							projection,
+							Data.CONTACT_ID + "=?",
+							new String[]{String.valueOf(contactId)},
+							Email.TYPE + " ASC ");
+
+					if(emailCursor != null && emailCursor.moveToFirst() && emailCursor.getCount() == 1) {
+						final int emailColumnIndex 	= emailCursor.getColumnIndex(Email.ADDRESS);
+						mPhoneNumber = emailCursor.getString(emailColumnIndex);
+						int type = emailCursor.getInt(emailCursor.getColumnIndexOrThrow(Email.TYPE));
+						mPhoneLabel = emailCursor.getString(emailCursor.getColumnIndex(Email.LABEL));
+						mPhoneLabel = Phone.getTypeLabel(getResources(), type, mPhoneLabel).toString();
+						emailCursor.close();
+					}
+				} break;
 			}
 
 			return null;

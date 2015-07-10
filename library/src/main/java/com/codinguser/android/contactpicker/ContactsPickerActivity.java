@@ -31,9 +31,21 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
 public class ContactsPickerActivity extends AppCompatActivity implements OnContactSelectedListener {
-    public static final String SELECTED_CONTACT_ID 	= "contact_id";
+    public static final String ARG_CONTACT_ID 	= "contact_id";
+	public static final String ARG_PICKER_MODE 	= "request_code";
+
 	public static final String KEY_PHONE_NUMBER 	= "phone_number";
 	public static final String KEY_CONTACT_NAME 	= "contact_name";
+	public static final String KEY_CONTACT_EMAIL	= "email";
+	/**
+	 * Request codes depending on what the user should select
+	 */
+	public static final int REQUEST_PHONE_NUMBER = 0x10;
+	public static final int REQUST_CONTACT_EMAIL = 0x11;
+
+	public enum PickerMode {PHONE, EMAIL}
+
+	protected int mRequestCode = REQUEST_PHONE_NUMBER;
 
 	/**
 	 * Starting point
@@ -46,8 +58,22 @@ public class ContactsPickerActivity extends AppCompatActivity implements OnConta
 		
 		FragmentManager 		fragmentManager 	= this.getSupportFragmentManager();
 		FragmentTransaction 	fragmentTransaction = fragmentManager.beginTransaction();
-		ContactsListFragment 	fragment 			= new ContactsListFragment();
-		
+
+		mRequestCode = getIntent().getIntExtra(ARG_PICKER_MODE, REQUEST_PHONE_NUMBER);
+
+		PickerMode pickerMode;
+		switch (mRequestCode){
+			case REQUST_CONTACT_EMAIL:
+				pickerMode = PickerMode.EMAIL;
+				break;
+
+			case REQUEST_PHONE_NUMBER:
+			default:
+				pickerMode = PickerMode.PHONE;
+				break;
+		}
+
+		ContactsListFragment fragment = ContactsListFragment.newInstance(pickerMode);
 		fragmentTransaction.replace(R.id.fragment_container, fragment);
 		fragmentTransaction.commit();
 
@@ -68,7 +94,8 @@ public class ContactsPickerActivity extends AppCompatActivity implements OnConta
 		
 		Fragment 	detailsFragment = new ContactDetailsFragment();
 		Bundle 		args 			= new Bundle();
-		args.putLong(ContactsPickerActivity.SELECTED_CONTACT_ID, contactId);
+		args.putLong(ARG_CONTACT_ID, contactId);
+		args.putInt(ARG_PICKER_MODE, mRequestCode);
 		detailsFragment.setArguments(args);
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -95,5 +122,14 @@ public class ContactsPickerActivity extends AppCompatActivity implements OnConta
         setResult(RESULT_OK, intent);
         finish();
 	}
-		
+
+	@Override
+	public void onContactEmailSelected(String emailAddress, String contactName) {
+		Intent intent = new Intent();
+		intent.putExtra(KEY_CONTACT_EMAIL, emailAddress);
+		intent.putExtra(KEY_CONTACT_NAME, contactName);
+
+		setResult(RESULT_OK, intent);
+		finish();
+	}
 }
