@@ -48,7 +48,7 @@ public class ContactsPickerActivity extends AppCompatActivity implements OnConta
 		FragmentTransaction 	fragmentTransaction = fragmentManager.beginTransaction();
 		ContactsListFragment 	fragment 			= new ContactsListFragment();
 		
-		fragmentTransaction.add(R.id.fragment_container, fragment);
+		fragmentTransaction.replace(R.id.fragment_container, fragment);
 		fragmentTransaction.commit();
 
 		ActionBar actionBar = getSupportActionBar();

@@ -27,5 +27,6 @@
 <resources>
     <string name="app_name">Contact Picker Sample</string>
     <string name="label_search">Search</string>
+    <string name="label_multiple_numbers">Multiple numbers</string>
 
 </resources>

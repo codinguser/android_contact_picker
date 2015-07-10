@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -51,6 +52,9 @@ import android.view.ViewGroup;
 import android.widget.AlphabetIndexer;
 import android.widget.ListView;
 import android.widget.SectionIndexer;
+import android.widget.TextView;
+
+import java.lang.ref.WeakReference;
 
 public class ContactsListFragment extends ListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor>, SearchView.OnQueryTextListener, SearchView.OnCloseListener  {
@@ -126,30 +130,15 @@ public class ContactsListFragment extends ListFragment implements
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		/* Retrieving the phone numbers in order to see if we have more than one */
-		String phoneNumber = null;
-		String name = null;
-		
-		String[] projection = new String[] {Phone.DISPLAY_NAME, Phone.NUMBER};
-    	final Cursor phoneCursor = getActivity().getContentResolver().query(
-			Phone.CONTENT_URI,
-			projection,
-			Data.CONTACT_ID + "=?",
-			new String[]{String.valueOf(id)},
-			null);
-    	
-    	if(phoneCursor.moveToFirst() && phoneCursor.isLast()) {
-    		final int contactNumberColumnIndex 	= phoneCursor.getColumnIndex(Phone.NUMBER);    			
-   			phoneNumber = phoneCursor.getString(contactNumberColumnIndex);
-   			name = phoneCursor.getString(phoneCursor.getColumnIndex(Phone.DISPLAY_NAME));
-    	}
-		
-    	if (phoneNumber != null){    		  		
-    		mContactsListener.onContactNumberSelected(phoneNumber, name);
-    	}
-    	else {
-    		mContactsListener.onContactNameSelected(id);
-    	}
+		ViewHolder viewHolder = (ViewHolder) v.getTag();
+		String phoneNumber = viewHolder.phoneNumber.getText().toString();
+		String name = viewHolder.contactName.getText().toString();
+
+		if (phoneNumber.equals(getString(R.string.label_multiple_numbers))){
+			mContactsListener.onContactNameSelected(id);
+		} else {
+			mContactsListener.onContactNumberSelected(phoneNumber, name);
+		}
 	}
 	
 	@Override
@@ -221,6 +210,14 @@ public class ContactsListFragment extends ListFragment implements
 		return true;
 	}
 
+	static class ViewHolder{
+		TextView contactName;
+		TextView phoneLabel;
+		TextView phoneNumber;
+		View separator;
+		PhoneNumberLookupTask phoneNumberLookupTask;
+	}
+
 	class IndexedListAdapter extends SimpleCursorAdapter implements SectionIndexer{
 
 		AlphabetIndexer alphaIndexer;
@@ -240,7 +237,37 @@ public class ContactsListFragment extends ListFragment implements
 
 			return super.swapCursor(c);
 		}
-		
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder viewHolder;
+			if (convertView == null){
+				LayoutInflater inflater = getLayoutInflater(null);
+				convertView = inflater.inflate(R.layout.list_item_contacts, parent, false);
+				viewHolder = new ViewHolder();
+				viewHolder.contactName = (TextView) convertView.findViewById(R.id.display_name);
+				viewHolder.phoneLabel = (TextView) convertView.findViewById(R.id.phone_label);
+				viewHolder.phoneNumber = (TextView) convertView.findViewById(R.id.phone_number);
+				viewHolder.separator = convertView.findViewById(R.id.label_separator);
+				convertView.setTag(viewHolder);
+			} else {
+				viewHolder = (ViewHolder) convertView.getTag();
+				viewHolder.phoneNumberLookupTask.cancel(true);
+			}
+
+			return super.getView(position, convertView, parent);
+		}
+
+		@Override
+		public void bindView(View view, Context context, Cursor cursor) {
+			super.bindView(view, context, cursor);
+
+			long contactId = cursor.getLong(cursor.getColumnIndexOrThrow(Contacts._ID));
+			ViewHolder viewHolder = (ViewHolder) view.getTag();
+			viewHolder.phoneNumberLookupTask = new PhoneNumberLookupTask(view);
+			viewHolder.phoneNumberLookupTask.execute(contactId);
+		}
+
 		@Override
 		public int getPositionForSection(int section) {
 			return alphaIndexer.getPositionForSection(section);
@@ -255,9 +282,67 @@ public class ContactsListFragment extends ListFragment implements
 		public Object[] getSections() {
 			return alphaIndexer == null ? null : alphaIndexer.getSections();
 		}
-	
 	}
 
+	/**
+	 * Task for looking up the phone number and displaying it next to the contact.
+	 * This task holds a weak reference to the view so that if it is recycled while task is running,
+	 * then the task does nothing.
+	 */
+	private class PhoneNumberLookupTask extends AsyncTask<Long, Void, Void> {
+		final WeakReference<View> mViewReference;
+
+		String mPhoneNumber;
+		String mPhoneLabel;
+
+		public PhoneNumberLookupTask(View view){
+			mViewReference = new WeakReference<>(view);
+		}
+
+		@Override
+		protected Void doInBackground(Long... ids) {
+			String[] projection = new String[] {Phone.DISPLAY_NAME, Phone.TYPE, Phone.NUMBER, Phone.LABEL};
+			long contactId = ids[0];
+
+			final Cursor phoneCursor = getActivity().getContentResolver().query(
+					Phone.CONTENT_URI,
+					projection,
+					Data.CONTACT_ID + "=?",
+					new String[]{String.valueOf(contactId)},
+					null);
+
+			if(phoneCursor != null && phoneCursor.moveToFirst() && phoneCursor.getCount() == 1) {
+				final int contactNumberColumnIndex 	= phoneCursor.getColumnIndex(Phone.NUMBER);
+				mPhoneNumber = phoneCursor.getString(contactNumberColumnIndex);
+				int type = phoneCursor.getInt(phoneCursor.getColumnIndexOrThrow(Phone.TYPE));
+				mPhoneLabel = phoneCursor.getString(phoneCursor.getColumnIndex(Phone.LABEL));
+				mPhoneLabel = Phone.getTypeLabel(getResources(), type, mPhoneLabel).toString();
+				phoneCursor.close();
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void param) {
+			View view = mViewReference.get();
+			if (view != null ){
+				ViewHolder viewHolder = (ViewHolder) view.getTag();
+				if (mPhoneNumber != null){
+					viewHolder.phoneNumber.setText(mPhoneNumber);
+					viewHolder.phoneLabel.setText(mPhoneLabel);
+					viewHolder.phoneLabel.setVisibility(View.VISIBLE);
+					viewHolder.separator.setVisibility(View.VISIBLE);
+				}
+				else {
+					viewHolder.phoneNumber.setText(getString(R.string.label_multiple_numbers));
+					viewHolder.phoneLabel.setVisibility(View.GONE);
+					viewHolder.separator.setVisibility(View.GONE);
+				}
+
+			}
+		}
+	}
 
 
 }
