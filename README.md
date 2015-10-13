@@ -23,7 +23,7 @@ and asynchronous contact loading introduced in the newer versions of Android.
 
 In order to use the library, add the following line to your Gradle dependencies:
 <pre> <code>
-compile 'com.codinguser.android:contactpicker:3.0.0'
+compile 'com.codinguser.android:contactpicker:3.0.0@aar'
 </code> </pre>
 # Usage
 
